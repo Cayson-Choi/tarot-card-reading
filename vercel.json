@@ -1,12 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "cd web && echo 'No build needed'",
-  "outputDirectory": "web",
-  "installCommand": "cd web && echo 'No install needed'",
-  "framework": null,
-  "git": {
-    "deploymentEnabled": {
-      "master": true
-    }
-  }
+  "buildCommand": "echo 'No build needed'",
+  "installCommand": "echo 'No install needed'",
+  "framework": null
 }
