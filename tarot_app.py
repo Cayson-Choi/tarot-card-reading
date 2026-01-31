@@ -28,6 +28,7 @@ except ImportError:
 
 from card_manager import CardManager
 from spreads import get_spread, get_spread_info
+from ai_interpreter import TarotAIInterpreter
 
 
 class SoundManager:
@@ -319,6 +320,7 @@ class ReadingWidget(QWidget):
         super().__init__(parent)
         self.card_manager = card_manager
         self.sound_manager = sound_manager
+        self.ai_interpreter = TarotAIInterpreter()
         self.spread = None
         self.card_widgets = []
         self.current_card_index = 0
@@ -529,6 +531,39 @@ class ReadingWidget(QWidget):
         save_btn.clicked.connect(self.save_current_reading)
         buttons_layout.addWidget(save_btn)
 
+        # AI 해설 버튼
+        interpret_btn = QPushButton("🔮 AI 해설")
+        interpret_btn.setFont(QFont("Arial", 13, QFont.Bold))
+        interpret_btn.setFixedSize(140, 60)
+        interpret_btn.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #8b5cf6, stop:1 #6366f1);
+                color: white;
+                border: 2px solid #c4b5fd;
+                border-radius: 12px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #a78bfa, stop:1 #818cf8);
+                border: 2px solid #ddd6fe;
+            }
+            QPushButton:pressed {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #7c3aed, stop:1 #4f46e5);
+            }
+            QPushButton:disabled {
+                background: #374151;
+                border: 2px solid #6b7280;
+                color: #9ca3af;
+            }
+        """)
+        interpret_btn.clicked.connect(self.show_ai_interpretation)
+        interpret_btn.setEnabled(False)  # 초기에는 비활성화
+        buttons_layout.addWidget(interpret_btn)
+        self.interpret_button = interpret_btn
+
         self.main_layout.addLayout(buttons_layout)
 
         # 뽑은 카드 목록
@@ -576,6 +611,10 @@ class ReadingWidget(QWidget):
         # 다음 카드로
         self.current_card_index += 1
 
+        # 해설 버튼 활성화 (최소 1장 이상 뽑으면)
+        if self.current_card_index >= 1:
+            self.interpret_button.setEnabled(True)
+
         # 버튼 텍스트 업데이트
         remaining = len(self.card_widgets) - self.current_card_index
         if remaining > 0:
@@ -599,6 +638,115 @@ class ReadingWidget(QWidget):
 
         self.save_reading.emit(reading_data)
         QMessageBox.information(self, "저장 완료", "리딩이 저장되었습니다!")
+
+    def show_ai_interpretation(self):
+        """AI 해석 표시"""
+        if not self.drawn_cards:
+            QMessageBox.warning(self, "경고", "먼저 카드를 뽑아주세요!")
+            return
+
+        # 로딩 다이얼로그 표시
+        loading_dialog = QMessageBox(self)
+        loading_dialog.setWindowTitle("AI 해석 중...")
+        loading_dialog.setText("AI가 카드를 해석하고 있습니다...\n잠시만 기다려주세요.")
+        loading_dialog.setStandardButtons(QMessageBox.NoButton)
+        loading_dialog.setModal(True)
+        loading_dialog.show()
+
+        # UI 업데이트를 위한 이벤트 처리
+        QApplication.processEvents()
+
+        # AI 해석 생성
+        interpretation = self.ai_interpreter.interpret_reading(
+            self.spread.name,
+            self.drawn_cards
+        )
+
+        # 로딩 다이얼로그 닫기
+        loading_dialog.close()
+
+        # 해석 결과 다이얼로그
+        result_dialog = QDialog(self)
+        result_dialog.setWindowTitle("🔮 AI 타로 해석")
+        result_dialog.setMinimumSize(600, 500)
+
+        layout = QVBoxLayout()
+
+        # 타이틀
+        title = QLabel(f"📖 {self.spread.name} 해석")
+        title.setFont(QFont("Arial", 18, QFont.Bold))
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("color: #fbbf24; margin: 10px;")
+        layout.addWidget(title)
+
+        # 뽑은 카드 요약
+        cards_summary = QLabel("뽑은 카드:")
+        cards_summary.setFont(QFont("Arial", 12, QFont.Bold))
+        cards_summary.setStyleSheet("color: #a78bfa; margin: 5px;")
+        layout.addWidget(cards_summary)
+
+        cards_text = ""
+        for card_info in self.drawn_cards:
+            cards_text += f"  • {card_info['position']}: {card_info['card']}\n"
+
+        cards_label = QLabel(cards_text)
+        cards_label.setFont(QFont("Arial", 11))
+        cards_label.setStyleSheet("color: #e5e7eb; margin-left: 15px;")
+        cards_label.setWordWrap(True)
+        layout.addWidget(cards_label)
+
+        # 구분선
+        line = QFrame()
+        line.setFrameShape(QFrame.HLine)
+        line.setFrameShadow(QFrame.Sunken)
+        line.setStyleSheet("background-color: #475569;")
+        layout.addWidget(line)
+
+        # AI 해석 텍스트
+        interpretation_label = QLabel("AI 해석:")
+        interpretation_label.setFont(QFont("Arial", 12, QFont.Bold))
+        interpretation_label.setStyleSheet("color: #fbbf24; margin: 10px 5px 5px 5px;")
+        layout.addWidget(interpretation_label)
+
+        interpretation_text = QTextEdit()
+        interpretation_text.setReadOnly(True)
+        interpretation_text.setPlainText(interpretation)
+        interpretation_text.setFont(QFont("Arial", 11))
+        interpretation_text.setStyleSheet("""
+            QTextEdit {
+                background-color: #1e293b;
+                color: #f8fafc;
+                border: 2px solid #6366f1;
+                border-radius: 8px;
+                padding: 15px;
+                line-height: 1.6;
+            }
+        """)
+        layout.addWidget(interpretation_text)
+
+        # 닫기 버튼
+        close_btn = QPushButton("닫기")
+        close_btn.setFont(QFont("Arial", 12, QFont.Bold))
+        close_btn.setFixedSize(120, 40)
+        close_btn.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #6366f1, stop:1 #8b5cf6);
+                color: white;
+                border: 2px solid #c4b5fd;
+                border-radius: 8px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #818cf8, stop:1 #a78bfa);
+            }
+        """)
+        close_btn.clicked.connect(result_dialog.close)
+        layout.addWidget(close_btn, alignment=Qt.AlignCenter)
+
+        result_dialog.setLayout(layout)
+        result_dialog.exec_()
 
 
 class HistoryWidget(QWidget):

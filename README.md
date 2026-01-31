@@ -23,6 +23,13 @@ PyQt5 기반 타로 카드 뽑기 GUI 애플리케이션
   - 음소거 기능
   - 중복 방지 (한 세션에서 같은 카드 두 번 안 나옴)
 
+- **🔮 AI 해석 기능** (데스크톱 앱 전용)
+  - Llama 3.1 기반 AI 타로 카드 해석
+  - 스프레드와 카드 위치를 고려한 심층 분석
+  - 카드 조합에 따른 종합적인 메시지 제공
+  - 실용적이고 긍정적인 조언
+  - 완전 로컬 실행 (인터넷 불필요)
+
 ## 📁 프로젝트 구조
 
 ```
@@ -36,7 +43,10 @@ Taro/
 ├── tarot_app.py        # 메인 애플리케이션
 ├── spreads.py          # 스프레드 정의
 ├── card_manager.py     # 카드 관리
+├── ai_interpreter.py   # AI 해석 모듈
 ├── create_card_back.py # 카드 뒷면 생성 스크립트
+├── test_ai.py          # AI 기능 테스트
+├── run.bat             # Windows 실행 스크립트
 └── requirements.txt    # 필요한 패키지
 ```
 
@@ -53,8 +63,29 @@ pip install -r requirements.txt
 - Pillow (이미지 처리)
 - pygame (사운드, 선택사항)
 
-### 2. 앱 실행
+### 2. AI 해석 기능 설정 (선택사항)
 
+AI 해석 기능을 사용하려면 Ollama와 Llama 3.1 모델이 필요합니다.
+
+```bash
+# Ollama 설치 (https://ollama.com)
+# Windows: 설치 프로그램 다운로드
+
+# Llama 3.1 모델 다운로드
+ollama pull llama3.1:8b
+
+# AI 기능 테스트
+python test_ai.py
+```
+
+### 3. 앱 실행
+
+**Windows:**
+```bash
+run.bat
+```
+
+**Linux/Mac:**
 ```bash
 python tarot_app.py
 ```
@@ -69,7 +100,9 @@ python tarot_app.py
 1. "카드 뽑기" 버튼 클릭
 2. 왼쪽부터 순서대로 카드가 공개됨
 3. 각 카드 아래에 위치 의미 표시
-4. 모든 카드를 뽑으면 "저장" 가능
+4. 최소 1장 이상 뽑으면 "AI 해설" 버튼 활성화
+5. "AI 해설" 클릭 시 AI가 카드를 분석하여 해석 제공
+6. 모든 카드를 뽑으면 "저장" 가능
 
 ### 히스토리
 - "히스토리 보기"에서 과거 리딩 확인
@@ -94,13 +127,14 @@ python tarot_app.py
 
 ## 📝 TODO (선택적 추가 기능)
 
+- [x] AI 카드 해석 기능 (Llama 3.1)
 - [ ] 사운드 파일 추가 (카드 섞는 소리, 뽑는 소리)
-- [ ] 카드 의미 설명 팝업
 - [ ] 카드 뒤집기 애니메이션 (3D 효과)
 - [ ] 역방향 카드 지원
 - [ ] 다양한 테마/스킨
 - [ ] 리딩 메모 기능
 - [ ] PDF 내보내기
+- [ ] 웹 버전 AI 해석 (백엔드 API 필요)
 
 ## 🐛 문제 해결
 

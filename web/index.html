@@ -63,6 +63,7 @@
                 <button id="backBtn" class="action-btn back-btn">↩ 처음으로</button>
                 <button id="resetBtn" class="action-btn reset-btn">🔄 다시 뽑기</button>
                 <button id="saveBtn" class="action-btn save-btn">💾 저장</button>
+                <button id="aiBtn" class="action-btn ai-btn" disabled>🔮 AI 해설</button>
             </div>
 
             <div id="drawnCardsList" class="drawn-cards">뽑은 카드: </div>
@@ -105,6 +106,22 @@
         </div>
     </div>
 
+    <!-- AI 해석 모달 -->
+    <div id="aiModal" class="modal">
+        <div class="modal-content" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
+            <h3>🔮 AI 타로 해석</h3>
+            <div id="aiLoadingText" style="display: none; text-align: center; color: #a78bfa; padding: 20px;">
+                <p>AI가 카드를 해석하고 있습니다...</p>
+                <p style="font-size: 12px;">잠시만 기다려주세요 (최대 1분)</p>
+            </div>
+            <div id="aiContent" style="line-height: 1.8; color: #f8fafc; white-space: pre-wrap;"></div>
+            <div class="modal-buttons">
+                <button id="aiCloseBtn" class="modal-btn ok-btn">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="ai.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

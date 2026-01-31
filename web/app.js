@@ -94,6 +94,12 @@ function init() {
     document.getElementById('detailCloseBtn').addEventListener('click', () => {
         document.getElementById('detailModal').classList.remove('active');
     });
+
+    // AI 모달 버튼
+    document.getElementById('aiBtn').addEventListener('click', showAIInterpretation);
+    document.getElementById('aiCloseBtn').addEventListener('click', () => {
+        document.getElementById('aiModal').classList.remove('active');
+    });
 }
 
 // 화면 전환
@@ -178,6 +184,9 @@ function startReading(spread) {
     drawBtn.textContent = '🎴 카드 뽑기';
     drawBtn.disabled = false;
 
+    // AI 해설 버튼 비활성화
+    document.getElementById('aiBtn').disabled = true;
+
     document.getElementById('drawnCardsList').textContent = '뽑은 카드: ';
 
     showScreen('reading');
@@ -223,6 +232,11 @@ function drawNextCard() {
 
     // 다음 카드로
     currentCardIndex++;
+
+    // AI 해설 버튼 활성화 (최소 1장 이상 뽑으면)
+    if (currentCardIndex >= 1) {
+        document.getElementById('aiBtn').disabled = false;
+    }
 
     // 버튼 텍스트 업데이트
     const drawBtn = document.getElementById('drawBtn');
@@ -339,6 +353,50 @@ function toggleFullscreen() {
         document.documentElement.requestFullscreen();
     } else {
         document.exitFullscreen();
+    }
+}
+
+// AI 해석 표시
+async function showAIInterpretation() {
+    if (drawnCards.length === 0) {
+        alert('먼저 카드를 뽑아주세요!');
+        return;
+    }
+
+    // Ollama 연결 확인
+    const isConnected = await tarotAI.testConnection();
+    if (!isConnected) {
+        alert('Ollama에 연결할 수 없습니다!\n\n로컬에 Ollama가 실행 중인지 확인해주세요.\n(http://localhost:11434)');
+        return;
+    }
+
+    // 모달 열기
+    const modal = document.getElementById('aiModal');
+    const loadingText = document.getElementById('aiLoadingText');
+    const content = document.getElementById('aiContent');
+
+    modal.classList.add('active');
+    loadingText.style.display = 'block';
+    content.textContent = '';
+
+    try {
+        // AI 해석 생성 (스트리밍)
+        await tarotAI.interpretReadingStream(
+            currentSpread.name,
+            drawnCards,
+            (chunk) => {
+                // 첫 청크가 도착하면 로딩 숨기기
+                if (loadingText.style.display !== 'none') {
+                    loadingText.style.display = 'none';
+                }
+                // 실시간으로 텍스트 추가
+                content.textContent += chunk;
+            }
+        );
+
+    } catch (error) {
+        loadingText.style.display = 'none';
+        content.textContent = `AI 해석 생성 중 오류가 발생했습니다.\n\n오류: ${error.message}\n\n다음을 확인해주세요:\n1. Ollama가 실행 중인지 확인\n2. Llama 3.1 모델이 설치되어 있는지 확인\n   (ollama pull llama3.1:8b)`;
     }
 }
 

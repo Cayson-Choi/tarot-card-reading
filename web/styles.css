@@ -280,6 +280,23 @@ body {
     border-color: #a7f3d0;
 }
 
+.ai-btn {
+    background: linear-gradient(90deg, #8b5cf6, #6366f1);
+    border-color: #c4b5fd;
+}
+
+.ai-btn:hover {
+    background: linear-gradient(90deg, #a78bfa, #818cf8);
+    border-color: #ddd6fe;
+}
+
+.ai-btn:disabled {
+    background: #374151;
+    border-color: #6b7280;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
 /* 뽑은 카드 목록 */
 .drawn-cards {
     text-align: center;
