@@ -363,13 +363,6 @@ async function showAIInterpretation() {
         return;
     }
 
-    // Ollama 연결 확인
-    const isConnected = await tarotAI.testConnection();
-    if (!isConnected) {
-        alert('Ollama에 연결할 수 없습니다!\n\n로컬에 Ollama가 실행 중인지 확인해주세요.\n(http://localhost:11434)');
-        return;
-    }
-
     // 모달 열기
     const modal = document.getElementById('aiModal');
     const loadingText = document.getElementById('aiLoadingText');
@@ -380,23 +373,35 @@ async function showAIInterpretation() {
     content.textContent = '';
 
     try {
-        // AI 해석 생성 (스트리밍)
-        await tarotAI.interpretReadingStream(
-            currentSpread.name,
-            drawnCards,
-            (chunk) => {
-                // 첫 청크가 도착하면 로딩 숨기기
-                if (loadingText.style.display !== 'none') {
-                    loadingText.style.display = 'none';
-                }
-                // 실시간으로 텍스트 추가
-                content.textContent += chunk;
-            }
-        );
+        // Vercel Serverless Function 호출
+        const response = await fetch('/api/interpret', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                spread_name: currentSpread.name,
+                cards: drawnCards
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.error || 'AI 해석 생성 실패');
+        }
+
+        // 로딩 숨기고 결과 표시
+        loadingText.style.display = 'none';
+        content.textContent = data.interpretation;
 
     } catch (error) {
         loadingText.style.display = 'none';
-        content.textContent = `AI 해석 생성 중 오류가 발생했습니다.\n\n오류: ${error.message}\n\n다음을 확인해주세요:\n1. Ollama가 실행 중인지 확인\n2. Llama 3.1 모델이 설치되어 있는지 확인\n   (ollama pull llama3.1:8b)`;
+        content.textContent = `AI 해석 생성 중 오류가 발생했습니다.\n\n오류: ${error.message}\n\n잠시 후 다시 시도해주세요.`;
     }
 }
 
