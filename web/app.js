@@ -96,9 +96,42 @@ function init() {
     });
 
     // AI 모달 버튼
-    document.getElementById('aiBtn').addEventListener('click', showAIInterpretation);
+    document.getElementById('aiBtn').addEventListener('click', promptAIPassword);
     document.getElementById('aiCloseBtn').addEventListener('click', () => {
         document.getElementById('aiModal').classList.remove('active');
+    });
+
+    // 비밀번호 모달 버튼
+    document.getElementById('passwordOkBtn').addEventListener('click', validateAIPassword);
+    document.getElementById('passwordCancelBtn').addEventListener('click', () => {
+        document.getElementById('passwordModal').classList.remove('active');
+        document.getElementById('passwordInput').value = '';
+    });
+
+    // 관리자 로그인 버튼
+    document.getElementById('adminBtn').addEventListener('click', showAdminLogin);
+    document.getElementById('adminLoginOkBtn').addEventListener('click', validateAdminPassword);
+    document.getElementById('adminLoginCancelBtn').addEventListener('click', () => {
+        document.getElementById('adminLoginModal').classList.remove('active');
+        document.getElementById('adminPasswordInput').value = '';
+    });
+
+    // 관리자 패널 버튼
+    document.getElementById('updatePasswordBtn').addEventListener('click', updateAIPassword);
+    document.getElementById('adminPanelCloseBtn').addEventListener('click', () => {
+        document.getElementById('adminPanelModal').classList.remove('active');
+        document.getElementById('newPasswordInput').value = '';
+    });
+
+    // Enter 키로 비밀번호 입력
+    document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') validateAIPassword();
+    });
+    document.getElementById('adminPasswordInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') validateAdminPassword();
+    });
+    document.getElementById('newPasswordInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') updateAIPassword();
     });
 }
 
@@ -145,6 +178,12 @@ function startReading(spread) {
     currentSpread = spread;
     currentCardIndex = 0;
     drawnCards = [];
+
+    // 질문 입력 초기화
+    const questionInput = document.getElementById('questionInput');
+    if (questionInput) {
+        questionInput.value = '';
+    }
 
     // 카드 덱 초기화 및 셔플
     availableCards = [...ALL_CARDS];
@@ -356,6 +395,157 @@ function toggleFullscreen() {
     }
 }
 
+// AI 비밀번호 입력 프롬프트
+function promptAIPassword() {
+    if (drawnCards.length === 0) {
+        alert('먼저 카드를 뽑아주세요!');
+        return;
+    }
+
+    // 비밀번호 모달 열기
+    document.getElementById('passwordModal').classList.add('active');
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('passwordInput').focus();
+}
+
+// AI 비밀번호 검증
+async function validateAIPassword() {
+    const passwordInput = document.getElementById('passwordInput');
+    const password = passwordInput.value.trim();
+
+    if (password.length !== 4) {
+        alert('4자리 비밀번호를 입력해주세요.');
+        return;
+    }
+
+    try {
+        // 비밀번호 검증 API 호출
+        const response = await fetch('/api/validate-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ password: password })
+        });
+
+        const data = await response.json();
+
+        if (data.valid) {
+            // 비밀번호 모달 닫기
+            document.getElementById('passwordModal').classList.remove('active');
+            passwordInput.value = '';
+
+            // AI 해석 실행
+            showAIInterpretation();
+        } else {
+            alert('비밀번호가 틀렸습니다.\n\n비밀번호가 필요하신 경우\n010-7433-1947로 문자 주세요.');
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
+    } catch (error) {
+        alert('비밀번호 검증 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
+        console.error('Password validation error:', error);
+    }
+}
+
+// 관리자 로그인 모달 열기
+function showAdminLogin() {
+    document.getElementById('adminLoginModal').classList.add('active');
+    document.getElementById('adminPasswordInput').value = '';
+    document.getElementById('adminPasswordInput').focus();
+}
+
+// 관리자 비밀번호 검증
+async function validateAdminPassword() {
+    const passwordInput = document.getElementById('adminPasswordInput');
+    const password = passwordInput.value.trim();
+
+    if (password.length !== 4) {
+        alert('4자리 관리자 비밀번호를 입력해주세요.');
+        return;
+    }
+
+    try {
+        // 관리자 비밀번호 검증 API 호출
+        const response = await fetch('/api/admin-login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ password: password })
+        });
+
+        const data = await response.json();
+
+        if (data.valid) {
+            // 로그인 모달 닫기
+            document.getElementById('adminLoginModal').classList.remove('active');
+            passwordInput.value = '';
+
+            // 관리자 패널 열기
+            showAdminPanel(data.current_ai_password);
+        } else {
+            alert('관리자 비밀번호가 틀렸습니다.');
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
+    } catch (error) {
+        alert('관리자 로그인 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
+        console.error('Admin login error:', error);
+    }
+}
+
+// 관리자 패널 표시
+function showAdminPanel(currentPassword) {
+    document.getElementById('currentPassword').textContent = currentPassword;
+    document.getElementById('adminPanelModal').classList.add('active');
+    document.getElementById('newPasswordInput').value = '';
+}
+
+// AI 비밀번호 변경
+async function updateAIPassword() {
+    const newPasswordInput = document.getElementById('newPasswordInput');
+    const newPassword = newPasswordInput.value.trim();
+
+    if (newPassword.length !== 4) {
+        alert('4자리 새 비밀번호를 입력해주세요.');
+        return;
+    }
+
+    if (!/^\d{4}$/.test(newPassword)) {
+        alert('비밀번호는 숫자 4자리여야 합니다.');
+        return;
+    }
+
+    if (!confirm(`AI 비밀번호를 '${newPassword}'로 변경하시겠습니까?`)) {
+        return;
+    }
+
+    try {
+        // 비밀번호 변경 API 호출
+        const response = await fetch('/api/update-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ new_password: newPassword })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('AI 비밀번호가 성공적으로 변경되었습니다!');
+            document.getElementById('currentPassword').textContent = newPassword;
+            newPasswordInput.value = '';
+        } else {
+            alert('비밀번호 변경에 실패했습니다.\n' + (data.error || ''));
+        }
+    } catch (error) {
+        alert('비밀번호 변경 중 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.');
+        console.error('Password update error:', error);
+    }
+}
+
 // AI 해석 표시
 async function showAIInterpretation() {
     if (drawnCards.length === 0) {
@@ -372,6 +562,10 @@ async function showAIInterpretation() {
     loadingText.style.display = 'block';
     content.textContent = '';
 
+    // 사용자 질문 가져오기
+    const questionInput = document.getElementById('questionInput');
+    const userQuestion = questionInput ? questionInput.value.trim() : '';
+
     try {
         // Vercel Serverless Function 호출
         const response = await fetch('/api/interpret', {
@@ -381,7 +575,8 @@ async function showAIInterpretation() {
             },
             body: JSON.stringify({
                 spread_name: currentSpread.name,
-                cards: drawnCards
+                cards: drawnCards,
+                question: userQuestion
             })
         });
 

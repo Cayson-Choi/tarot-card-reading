@@ -11,6 +11,7 @@
     <div class="toolbar">
         <button id="muteBtn" class="icon-btn" title="음소거">🔊</button>
         <button id="fullscreenBtn" class="icon-btn" title="전체화면">⛶</button>
+        <button id="adminBtn" class="icon-btn" title="관리자" style="margin-left: auto;">⚙️</button>
     </div>
 
     <!-- 메인 컨테이너 -->
@@ -53,6 +54,12 @@
         <!-- 리딩 화면 -->
         <div id="readingScreen" class="screen">
             <h2 id="readingTitle" class="reading-title"></h2>
+
+            <!-- 질문 입력 -->
+            <div class="question-container">
+                <label for="questionInput" class="question-label">🤔 무엇이 궁금하신가요? (선택사항)</label>
+                <input type="text" id="questionInput" class="question-input" placeholder="예: 새로운 일을 시작해야 할까요?, 연애운이 어떨까요?" maxlength="200">
+            </div>
 
             <div id="cardsContainer" class="cards-scroll">
                 <div id="cardsWrapper" class="cards-wrapper"></div>
@@ -117,6 +124,55 @@
             <div id="aiContent" style="line-height: 1.8; color: #f8fafc; white-space: pre-wrap;"></div>
             <div class="modal-buttons">
                 <button id="aiCloseBtn" class="modal-btn ok-btn">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 비밀번호 입력 모달 -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <h3>🔐 AI 해설 비밀번호</h3>
+            <p style="color: #cbd5e1; margin-bottom: 15px;">AI 해설 기능을 사용하려면 비밀번호를 입력하세요.</p>
+            <input type="password" id="passwordInput" class="password-input" placeholder="4자리 비밀번호" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+            <p style="font-size: 12px; color: #94a3b8; margin-top: 10px;">
+                비밀번호가 필요하신 경우<br>
+                📞 <a href="sms:010-7433-1947?body=타로 AI 해석 비밀번호가 필요합니다." style="color: #a78bfa; text-decoration: underline; cursor: pointer;">010-7433-1947</a>로 문자 주세요
+            </p>
+            <div class="modal-buttons">
+                <button id="passwordOkBtn" class="modal-btn ok-btn">확인</button>
+                <button id="passwordCancelBtn" class="modal-btn cancel-btn">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 관리자 로그인 모달 -->
+    <div id="adminLoginModal" class="modal">
+        <div class="modal-content">
+            <h3>⚙️ 관리자 로그인</h3>
+            <p style="color: #cbd5e1; margin-bottom: 15px;">관리자 비밀번호를 입력하세요.</p>
+            <input type="password" id="adminPasswordInput" class="password-input" placeholder="관리자 비밀번호" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+            <div class="modal-buttons">
+                <button id="adminLoginOkBtn" class="modal-btn ok-btn">로그인</button>
+                <button id="adminLoginCancelBtn" class="modal-btn cancel-btn">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 관리자 패널 모달 -->
+    <div id="adminPanelModal" class="modal">
+        <div class="modal-content">
+            <h3>⚙️ 관리자 패널</h3>
+            <div style="margin: 20px 0;">
+                <label style="display: block; color: #cbd5e1; margin-bottom: 8px;">현재 AI 비밀번호:</label>
+                <div id="currentPassword" style="background: rgba(30, 41, 59, 0.8); padding: 10px; border-radius: 5px; color: #a78bfa; font-weight: bold; text-align: center;">****</div>
+            </div>
+            <div style="margin: 20px 0;">
+                <label style="display: block; color: #cbd5e1; margin-bottom: 8px;">새 AI 비밀번호 설정:</label>
+                <input type="password" id="newPasswordInput" class="password-input" placeholder="새 4자리 비밀번호" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+            </div>
+            <div class="modal-buttons">
+                <button id="updatePasswordBtn" class="modal-btn ok-btn">비밀번호 변경</button>
+                <button id="adminPanelCloseBtn" class="modal-btn cancel-btn">닫기</button>
             </div>
         </div>
     </div>

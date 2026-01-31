@@ -203,6 +203,45 @@ body {
     color: #fbbf24;
 }
 
+/* 질문 입력 */
+.question-container {
+    margin: 20px auto;
+    max-width: 600px;
+    padding: 0 20px;
+}
+
+.question-label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #a78bfa;
+    text-align: center;
+}
+
+.question-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(30, 41, 59, 0.8);
+    border: 2px solid #6366f1;
+    border-radius: 10px;
+    color: #f8fafc;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.3s;
+}
+
+.question-input::placeholder {
+    color: #94a3b8;
+}
+
+.question-input:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    background: rgba(30, 41, 59, 0.95);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
 /* 버튼 행 */
 .buttons-row {
     display: flex;
@@ -385,6 +424,13 @@ body {
     background: #0f172a;
     color: white;
     margin-bottom: 20px;
+}
+
+.password-input {
+    font-size: 20px;
+    text-align: center;
+    letter-spacing: 8px;
+    font-weight: bold;
 }
 
 .modal-buttons {
