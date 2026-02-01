@@ -334,16 +334,74 @@ async function downloadCardsAsImage() {
     }
 
     try {
-        const cardsWrapper = document.getElementById('cardsWrapper');
+        // 임시 컨테이너 생성 (모든 카드가 보이도록)
+        const tempContainer = document.createElement('div');
+        tempContainer.style.position = 'fixed';
+        tempContainer.style.top = '-10000px';
+        tempContainer.style.left = '0';
+        tempContainer.style.backgroundColor = '#0f172a';
+        tempContainer.style.padding = '40px';
+        tempContainer.style.display = 'flex';
+        tempContainer.style.gap = '20px';
+        tempContainer.style.alignItems = 'center';
+        tempContainer.style.justifyContent = 'center';
+
+        // 카드 개수에 따라 카드 크기 조절
+        const cardCount = drawnCards.length;
+        let cardWidth, cardHeight;
+
+        if (cardCount <= 3) {
+            cardWidth = 300;
+            cardHeight = 500;
+        } else if (cardCount <= 5) {
+            cardWidth = 240;
+            cardHeight = 400;
+        } else if (cardCount <= 7) {
+            cardWidth = 200;
+            cardHeight = 333;
+        } else {
+            cardWidth = 160;
+            cardHeight = 267;
+        }
+
+        // 각 카드를 임시 컨테이너에 추가
+        drawnCards.forEach(cardData => {
+            const cardDiv = document.createElement('div');
+            cardDiv.style.width = cardWidth + 'px';
+            cardDiv.style.height = cardHeight + 'px';
+            cardDiv.style.border = '3px solid #fbbf24';
+            cardDiv.style.borderRadius = '12px';
+            cardDiv.style.overflow = 'hidden';
+            cardDiv.style.backgroundColor = '#1e293b';
+            cardDiv.style.flexShrink = '0';
+
+            const img = document.createElement('img');
+            img.src = `public/cards/${cardData.file}`;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            img.alt = cardData.card;
+
+            cardDiv.appendChild(img);
+            tempContainer.appendChild(cardDiv);
+        });
+
+        document.body.appendChild(tempContainer);
+
+        // 이미지 로딩 대기
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         // html2canvas로 캡처
-        const canvas = await html2canvas(cardsWrapper, {
+        const canvas = await html2canvas(tempContainer, {
             backgroundColor: '#0f172a',
-            scale: 2, // 고해상도
+            scale: 2,
             logging: false,
             useCORS: true,
             allowTaint: true
         });
+
+        // 임시 컨테이너 제거
+        document.body.removeChild(tempContainer);
 
         // 캔버스를 이미지로 변환
         canvas.toBlob((blob) => {
