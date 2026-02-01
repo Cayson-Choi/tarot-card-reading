@@ -202,6 +202,10 @@ function startReading(spread) {
         const card = document.createElement('div');
         card.className = 'card';
         card.dataset.index = i;
+        card.dataset.revealed = 'false';
+
+        // 카드 클릭 이벤트 추가
+        card.addEventListener('click', () => drawCardAtIndex(i));
 
         const img = document.createElement('img');
         img.src = 'public/assets/card_back.png';
@@ -218,10 +222,9 @@ function startReading(spread) {
         wrapper.appendChild(slot);
     }
 
-    // 버튼 초기화
+    // 버튼 초기화 - 카드 뽑기 버튼 숨기기
     const drawBtn = document.getElementById('drawBtn');
-    drawBtn.textContent = '🎴 카드 뽑기';
-    drawBtn.disabled = false;
+    drawBtn.style.display = 'none';
 
     // AI 해설 버튼과 다운로드 버튼 비활성화
     document.getElementById('aiBtn').disabled = true;
@@ -287,6 +290,53 @@ function drawNextCard() {
     } else {
         drawBtn.textContent = '✅ 완료';
         drawBtn.disabled = true;
+    }
+}
+
+// 특정 위치의 카드 뽑기 (클릭으로)
+function drawCardAtIndex(index) {
+    const cards = document.querySelectorAll('.card');
+    const card = cards[index];
+
+    // 이미 뽑힌 카드는 무시
+    if (card.dataset.revealed === 'true') {
+        return;
+    }
+
+    // 사용 가능한 카드가 없으면
+    if (availableCards.length === 0) {
+        alert('더 이상 뽑을 카드가 없습니다!');
+        return;
+    }
+
+    // 랜덤 카드 선택
+    const cardFile = availableCards.pop();
+    const cardName = cardFile.replace('.jpg', '');
+
+    // 카드 정보 저장
+    drawnCards.push({
+        position: currentSpread.positions[index],
+        card: cardName,
+        file: cardFile
+    });
+
+    // 카드 표시 (플립 애니메이션)
+    card.classList.add('revealed');
+    card.dataset.revealed = 'true';
+
+    setTimeout(() => {
+        const img = card.querySelector('img');
+        img.src = `public/cards/${cardFile}`;
+        img.alt = cardName;
+    }, 400);
+
+    // 뽑은 카드 목록 업데이트
+    updateDrawnCardsList();
+
+    // AI 해설 버튼과 다운로드 버튼 활성화
+    if (drawnCards.length >= 1) {
+        document.getElementById('aiBtn').disabled = false;
+        document.getElementById('downloadBtn').disabled = false;
     }
 }
 
