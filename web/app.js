@@ -80,6 +80,7 @@ function init() {
     document.getElementById('backBtn').addEventListener('click', showMainMenu);
     document.getElementById('resetBtn').addEventListener('click', resetReading);
     document.getElementById('saveBtn').addEventListener('click', saveReading);
+    document.getElementById('downloadBtn').addEventListener('click', downloadCardsAsImage);
     document.getElementById('historyBackBtn').addEventListener('click', showMainMenu);
     document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
     document.getElementById('muteBtn').addEventListener('click', toggleMute);
@@ -222,8 +223,9 @@ function startReading(spread) {
     drawBtn.textContent = '🎴 카드 뽑기';
     drawBtn.disabled = false;
 
-    // AI 해설 버튼 비활성화
+    // AI 해설 버튼과 다운로드 버튼 비활성화
     document.getElementById('aiBtn').disabled = true;
+    document.getElementById('downloadBtn').disabled = true;
 
     document.getElementById('drawnCardsList').textContent = '뽑은 카드: ';
 
@@ -271,9 +273,10 @@ function drawNextCard() {
     // 다음 카드로
     currentCardIndex++;
 
-    // AI 해설 버튼 활성화 (최소 1장 이상 뽑으면)
+    // AI 해설 버튼과 다운로드 버튼 활성화 (최소 1장 이상 뽑으면)
     if (currentCardIndex >= 1) {
         document.getElementById('aiBtn').disabled = false;
+        document.getElementById('downloadBtn').disabled = false;
     }
 
     // 버튼 텍스트 업데이트
@@ -321,6 +324,43 @@ function saveReading() {
     localStorage.setItem('tarotHistory', JSON.stringify(history));
 
     alert('리딩이 저장되었습니다!');
+}
+
+// 카드 이미지 다운로드
+async function downloadCardsAsImage() {
+    if (drawnCards.length === 0) {
+        alert('뽑은 카드가 없습니다!');
+        return;
+    }
+
+    try {
+        const cardsWrapper = document.getElementById('cardsWrapper');
+
+        // html2canvas로 캡처
+        const canvas = await html2canvas(cardsWrapper, {
+            backgroundColor: '#0f172a',
+            scale: 2, // 고해상도
+            logging: false,
+            useCORS: true,
+            allowTaint: true
+        });
+
+        // 캔버스를 이미지로 변환
+        canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+            link.download = `tarot-reading-${timestamp}.png`;
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+        }, 'image/png');
+
+        alert('카드 이미지가 다운로드되었습니다!');
+    } catch (error) {
+        console.error('이미지 다운로드 실패:', error);
+        alert('이미지 다운로드에 실패했습니다. 다시 시도해주세요.');
+    }
 }
 
 // 히스토리 관리
