@@ -201,6 +201,7 @@ body {
     font-size: 12px;
     font-weight: bold;
     color: #fbbf24;
+    display: none;
 }
 
 /* 질문 입력 */
