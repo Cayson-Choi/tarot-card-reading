@@ -1,18 +1,14 @@
-import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CARD_BACK } from '../data/cards';
 import { useLanguage } from '../i18n/LanguageContext';
 
 export default function TarotCard({ card, isFlipped, onFlip, positionLabel, index }) {
   const { lang } = useLanguage();
-  const [showFlash, setShowFlash] = useState(false);
   const cardName = lang === 'ko' ? card.nameKo : card.nameEn;
 
   const handleFlip = () => {
     if (isFlipped) return;
-    setShowFlash(true);
     onFlip(card.id);
-    setTimeout(() => setShowFlash(false), 500);
   };
 
   return (
@@ -24,7 +20,7 @@ export default function TarotCard({ card, isFlipped, onFlip, positionLabel, inde
     >
       {/* 3D Card Container */}
       <div
-        className={`relative cursor-pointer select-none ${isFlipped ? 'cursor-default' : ''}`}
+        className={`relative select-none ${isFlipped ? 'cursor-default' : 'cursor-pointer'}`}
         style={{ perspective: 1200 }}
         onClick={handleFlip}
       >
@@ -32,12 +28,17 @@ export default function TarotCard({ card, isFlipped, onFlip, positionLabel, inde
           className="relative w-[105px] h-[180px] md:w-[150px] md:h-[258px]"
           animate={{ rotateY: isFlipped ? 180 : 0 }}
           transition={{ duration: 1.8, ease: [0.25, 0.8, 0.25, 1] }}
-          style={{ transformStyle: 'preserve-3d' }}
+          style={{
+            transformStyle: 'preserve-3d',
+          }}
         >
           {/* Back face */}
           <div
             className="absolute inset-0 rounded-lg overflow-hidden"
-            style={{ backfaceVisibility: 'hidden' }}
+            style={{
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
+            }}
           >
             <motion.div
               className="w-full h-full"
@@ -67,7 +68,11 @@ export default function TarotCard({ card, isFlipped, onFlip, positionLabel, inde
           {/* Front face */}
           <div
             className="absolute inset-0 rounded-lg overflow-hidden"
-            style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+            style={{
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+            }}
           >
             <img
               src={card.image}
@@ -84,19 +89,6 @@ export default function TarotCard({ card, isFlipped, onFlip, positionLabel, inde
             />
           </div>
         </motion.div>
-
-        {/* Flash effect on flip */}
-        <AnimatePresence>
-          {showFlash && (
-            <motion.div
-              className="absolute inset-0 rounded-lg bg-white/80 pointer-events-none z-10"
-              initial={{ opacity: 0.8 }}
-              animate={{ opacity: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-            />
-          )}
-        </AnimatePresence>
       </div>
 
       {/* Card name (visible after flip) */}
