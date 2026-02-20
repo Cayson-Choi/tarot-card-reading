@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiOutlineCamera, HiOutlineArrowLeft } from 'react-icons/hi';
 import { useLanguage } from '../i18n/LanguageContext';
@@ -18,17 +18,23 @@ export default function TarotTable({
   onBack,
 }) {
   const { lang, t } = useLanguage();
-  const cardAreaRef = useRef(null);
+  const captureRef = useRef(null);
+  const [saving, setSaving] = useState(false);
 
   const handleSaveCardImage = async () => {
-    if (!cardAreaRef.current) return;
+    if (saving) return;
+    setSaving(true);
     try {
-      const canvas = await captureElement(cardAreaRef.current);
+      const canvas = await captureElement(captureRef.current);
       downloadCanvas(canvas, 'tarot-cards.png');
     } catch (err) {
       console.error('Capture failed:', err);
+    } finally {
+      setSaving(false);
     }
   };
+
+  const positions = lang === 'ko' ? spread?.positionsKo : spread?.positionsEn;
 
   return (
     <motion.div
@@ -89,15 +95,47 @@ export default function TarotTable({
 
       {allFlipped && <div className="mb-6" />}
 
-      {/* Card spread - capture target */}
-      <div ref={cardAreaRef} className="p-2 rounded-2xl" style={{ backgroundColor: '#0a0e1a' }}>
-        <SpreadLayout
-          cards={cards}
-          spread={spread}
-          flippedIds={flippedIds}
-          onFlip={onFlip}
-          lang={lang}
-        />
+      {/* Card spread (interactive view) */}
+      <SpreadLayout
+        cards={cards}
+        spread={spread}
+        flippedIds={flippedIds}
+        onFlip={onFlip}
+        lang={lang}
+      />
+
+      {/* Hidden capture area - simple flat layout for screenshot */}
+      <div
+        ref={captureRef}
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          top: 0,
+          backgroundColor: '#0a0e1a',
+          padding: '24px',
+          borderRadius: '16px',
+        }}
+      >
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center' }}>
+          {cards.map((card, i) => (
+            <div key={card.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+              <img
+                src={card.image}
+                alt={lang === 'ko' ? card.nameKo : card.nameEn}
+                style={{ width: '120px', height: '206px', objectFit: 'contain', borderRadius: '8px' }}
+                crossOrigin="anonymous"
+              />
+              <span style={{ color: 'rgba(251,191,36,0.8)', fontSize: '12px', fontWeight: 500 }}>
+                {lang === 'ko' ? card.nameKo : card.nameEn}
+              </span>
+              {positions && positions[i] && (
+                <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px' }}>
+                  {positions[i]}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Buttons - appear when all cards flipped */}
@@ -114,10 +152,11 @@ export default function TarotTable({
             <motion.button
               className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-sm
                          bg-gradient-to-r from-purple-600 to-indigo-600
-                         text-white active:scale-95 transition-transform"
+                         text-white active:scale-95 transition-transform disabled:opacity-50"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleSaveCardImage}
+              disabled={saving}
             >
               <HiOutlineCamera className="text-base" />
               {t.saveCardImage}

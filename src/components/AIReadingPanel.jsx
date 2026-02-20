@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { HiOutlineCamera, HiOutlineMail, HiOutlineArrowLeft } from 'react-icons/hi';
@@ -18,15 +18,19 @@ export default function AIReadingPanel({
   question,
 }) {
   const { lang, t } = useLanguage();
-  const panelRef = useRef(null);
+  const captureRef = useRef(null);
+  const [saving, setSaving] = useState(false);
 
   const handleSaveImage = async () => {
-    if (!panelRef.current) return;
+    if (saving) return;
+    setSaving(true);
     try {
-      const canvas = await captureElement(panelRef.current);
+      const canvas = await captureElement(captureRef.current);
       downloadCanvas(canvas, 'tarot-reading.png');
     } catch (err) {
       console.error('Capture failed:', err);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -126,8 +130,8 @@ export default function AIReadingPanel({
               {t.aiReadingTitle}
             </motion.h2>
 
-            {/* Capture target area */}
-            <div ref={panelRef} className="p-4 rounded-2xl" style={{ backgroundColor: '#0a0e1a' }}>
+            {/* Visible content */}
+            <div>
               {/* Question reminder */}
               {question && (
                 <motion.div
@@ -182,6 +186,81 @@ export default function AIReadingPanel({
               </motion.div>
             </div>
 
+            {/* Hidden capture area - flat static version for screenshot */}
+            <div
+              ref={captureRef}
+              style={{
+                position: 'absolute',
+                left: '-9999px',
+                top: 0,
+                backgroundColor: '#0a0e1a',
+                padding: '24px',
+                borderRadius: '16px',
+                width: '500px',
+                fontFamily: 'Inter, system-ui, sans-serif',
+                color: '#e2e8f0',
+              }}
+            >
+              {/* Title */}
+              <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                <h2 style={{
+                  fontFamily: 'Playfair Display, Georgia, serif',
+                  fontSize: '20px',
+                  fontWeight: 600,
+                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}>
+                  {t.aiReadingTitle}
+                </h2>
+              </div>
+
+              {/* Question */}
+              {question && (
+                <div style={{
+                  marginBottom: '16px',
+                  padding: '10px 16px',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}>
+                  <p style={{ fontSize: '11px', color: 'rgba(251,191,36,0.6)', marginBottom: '2px' }}>{t.yourQuestion}</p>
+                  <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>{question}</p>
+                </div>
+              )}
+
+              {/* Card images */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center', marginBottom: '20px' }}>
+                {cards.map((card) => (
+                  <div key={card.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <img
+                      src={card.image}
+                      alt={lang === 'ko' ? card.nameKo : card.nameEn}
+                      style={{ width: '60px', height: '103px', objectFit: 'contain', borderRadius: '4px' }}
+                      crossOrigin="anonymous"
+                    />
+                    <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', marginTop: '2px', maxWidth: '60px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center', display: 'block' }}>
+                      {lang === 'ko' ? card.nameKo : card.nameEn}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* AI text as plain text */}
+              <div style={{
+                padding: '20px',
+                borderRadius: '16px',
+                backgroundColor: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                fontSize: '13px',
+                lineHeight: '1.7',
+                color: 'rgba(255,255,255,0.75)',
+                whiteSpace: 'pre-wrap',
+              }}>
+                {reading}
+              </div>
+            </div>
+
             {/* Action buttons (outside capture area) */}
             <motion.div
               className="flex flex-col gap-3 items-center mt-6"
@@ -194,11 +273,12 @@ export default function AIReadingPanel({
                 {/* Save image */}
                 <button
                   onClick={handleSaveImage}
+                  disabled={saving}
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl
                              bg-gradient-to-r from-purple-600 to-indigo-600
                              text-white text-sm font-medium
                              hover:from-purple-500 hover:to-indigo-500
-                             active:scale-95 transition-all"
+                             active:scale-95 transition-all disabled:opacity-50"
                 >
                   <HiOutlineCamera className="text-base" />
                   {t.saveImage}
