@@ -1,7 +1,6 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "echo 'No build needed'",
-  "installCommand": "echo 'No install needed'",
-  "framework": null,
-  "outputDirectory": "web"
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
 }

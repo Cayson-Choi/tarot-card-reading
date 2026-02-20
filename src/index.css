@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+/* ─── Base Theme ─── */
+:root {
+  --bg-deep: #0a0e1a;
+  --gold-from: #fbbf24;
+  --gold-to: #f59e0b;
+  --purple: #a855f7;
+  --indigo: #6366f1;
+}
+
+/* ─── Global Styles (Mobile-First) ─── */
+html {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg-deep);
+  color: #e2e8f0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 100%, rgba(168,85,247,0.08) 0%, transparent 60%);
+  overflow-x: hidden;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+/* ─── Typography ─── */
+.font-serif {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, var(--gold-from), var(--gold-to));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Glass Morphism ─── */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Prose for AI Reading ─── */
+.prose-tarot {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.75);
+}
+.prose-tarot h1, .prose-tarot h2, .prose-tarot h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  background: linear-gradient(135deg, var(--gold-from), var(--gold-to));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+.prose-tarot h2 { font-size: 1.125rem; }
+.prose-tarot h3 { font-size: 1rem; }
+.prose-tarot p { margin-bottom: 0.75em; }
+.prose-tarot strong {
+  color: rgba(251, 191, 36, 0.85);
+  font-weight: 600;
+}
+.prose-tarot ul, .prose-tarot ol {
+  padding-left: 1.25em;
+  margin-bottom: 0.75em;
+}
+.prose-tarot li { margin-bottom: 0.25em; }
+.prose-tarot blockquote {
+  border-left: 2px solid rgba(251, 191, 36, 0.3);
+  padding-left: 1em;
+  margin: 1em 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+}
+.prose-tarot hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(251,191,36,0.3), transparent);
+  margin: 1.5em 0;
+}
+
+/* ─── Custom Scrollbar ─── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+/* ─── Card Touch Area ─── */
+.card-touch-area {
+  touch-action: manipulation;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* ─── Animations ─── */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(251,191,36,0.2); }
+  50% { box-shadow: 0 0 25px rgba(251,191,36,0.5); }
+}
+
+.glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* ─── Desktop Enhancements ─── */
+@media (hover: hover) {
+  .hover-lift:hover {
+    transform: translateY(-4px) scale(1.02);
+  }
+}
+
+/* ─── Desktop Scale-Up ─── */
+@media (min-width: 768px) {
+  .prose-tarot { font-size: 0.9375rem; }
+}
