@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { HiOutlineArrowLeft } from 'react-icons/hi';
 import { useLanguage } from '../i18n/LanguageContext';
+import BackButton from './BackButton';
 import { spreads } from '../data/spreads';
 
 const container = {
@@ -26,15 +26,7 @@ export default function CardSelector({ onSelect, customCount, onCustomCountChang
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Back button */}
-      <button
-        onClick={onBack}
-        className="self-start mb-4 flex items-center gap-1 text-xs text-white/40
-                   hover:text-white/60 transition-colors active:scale-95"
-      >
-        <HiOutlineArrowLeft className="text-sm" />
-        {t.back}
-      </button>
+      <BackButton onClick={onBack} />
 
       {/* Title */}
       <h2 className="font-serif text-xl md:text-2xl font-semibold mb-1 gold-gradient-text">

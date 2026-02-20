@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { HiOutlineCamera, HiOutlineMail, HiOutlineArrowLeft } from 'react-icons/hi';
+import { HiOutlineCamera, HiOutlineMail } from 'react-icons/hi';
 import { useLanguage } from '../i18n/LanguageContext';
 import LoadingSpinner from './LoadingSpinner';
+import BackButton from './BackButton';
 import { captureElement, downloadCanvas } from '../utils/captureUtils';
 
 export default function AIReadingPanel({
@@ -65,15 +66,7 @@ export default function AIReadingPanel({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Back button */}
-      <button
-        onClick={onBack}
-        className="self-start mb-4 flex items-center gap-1 text-xs text-white/40
-                   hover:text-white/60 transition-colors active:scale-95"
-      >
-        <HiOutlineArrowLeft className="text-sm" />
-        {t.back}
-      </button>
+      <BackButton onClick={onBack} />
 
       {/* Loading state - centered */}
       <AnimatePresence mode="wait">

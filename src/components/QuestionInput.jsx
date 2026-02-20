@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { HiOutlineArrowLeft } from 'react-icons/hi';
 import { useLanguage } from '../i18n/LanguageContext';
+import BackButton from './BackButton';
 
 export default function QuestionInput({ onSubmit, onSkip, onBack }) {
   const [question, setQuestion] = useState('');
@@ -17,15 +17,7 @@ export default function QuestionInput({ onSubmit, onSkip, onBack }) {
       transition={{ duration: 0.6 }}
     >
       <div className="w-full max-w-md">
-        {/* Back button */}
-        <button
-          onClick={onBack}
-          className="mb-4 flex items-center gap-1 text-xs text-white/40
-                     hover:text-white/60 transition-colors active:scale-95"
-        >
-          <HiOutlineArrowLeft className="text-sm" />
-          {t.back}
-        </button>
+        <BackButton onClick={onBack} />
 
         {/* Glass card */}
         <div className="relative rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6 md:p-8">
