@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HiOutlineCamera } from 'react-icons/hi';
 import { useLanguage } from '../i18n/LanguageContext';
 import SpreadLayout from './SpreadLayout';
 import BackButton from './BackButton';
@@ -135,45 +134,48 @@ export default function TarotTable({
       <AnimatePresence>
         {allFlipped && (
           <motion.div
-            className="mt-8 flex flex-col sm:flex-row gap-3 items-center"
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            transition={{ duration: 0.5, type: 'spring' }}
+            className="mt-8 flex gap-3 items-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
           >
             {/* Save card image button */}
             <motion.button
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-sm
-                         bg-gradient-to-r from-purple-600 to-indigo-600
-                         text-white active:scale-95 transition-transform disabled:opacity-50"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.95 }}
+              className="relative w-40 py-3 rounded-xl text-sm font-medium
+                         bg-white/[0.06] backdrop-blur-md border border-white/[0.12]
+                         text-white/80 transition-all duration-300
+                         hover:bg-white/[0.1] hover:border-white/20 hover:text-white
+                         active:scale-95 disabled:opacity-40"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.96 }}
               onClick={handleSaveCardImage}
               disabled={saving}
             >
-              <HiOutlineCamera className="text-base" />
               {t.saveCardImage}
             </motion.button>
 
             {/* AI Reading button */}
             <motion.button
-              className="relative px-8 py-3 rounded-xl font-semibold text-sm
-                         bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500
-                         text-gray-900 shadow-lg active:scale-95"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className="relative w-40 py-3 rounded-xl text-sm font-medium
+                         bg-white/[0.06] backdrop-blur-md border border-amber-400/25
+                         text-amber-300/90 transition-all duration-300
+                         hover:bg-amber-400/[0.08] hover:border-amber-400/40 hover:text-amber-200
+                         active:scale-95"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.96 }}
               onClick={onRequestAI}
             >
               <motion.span
                 className="absolute inset-0 rounded-xl pointer-events-none"
                 animate={{
                   boxShadow: [
-                    '0 0 15px rgba(251,191,36,0.3)',
-                    '0 0 30px rgba(251,191,36,0.6)',
-                    '0 0 15px rgba(251,191,36,0.3)',
+                    '0 0 8px rgba(251,191,36,0.08)',
+                    '0 0 16px rgba(251,191,36,0.15)',
+                    '0 0 8px rgba(251,191,36,0.08)',
                   ],
                 }}
-                transition={{ duration: 2, repeat: Infinity }}
+                transition={{ duration: 3, repeat: Infinity }}
               />
               {t.getAIReading}
             </motion.button>

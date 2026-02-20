@@ -7,22 +7,9 @@ export default function LoadingSpinner() {
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center gap-8">
       {/* Rotating card with orbiting particles */}
-      <div className="relative">
-        {/* Outer glow ring */}
+      <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
         <motion.div
-          className="absolute -inset-8 rounded-full"
-          animate={{
-            boxShadow: [
-              '0 0 30px 10px rgba(168,85,247,0.1)',
-              '0 0 60px 20px rgba(168,85,247,0.2)',
-              '0 0 30px 10px rgba(168,85,247,0.1)',
-            ],
-          }}
-          transition={{ duration: 3, repeat: Infinity }}
-        />
-
-        <motion.div
-          className="w-20 h-28 rounded-lg border-2 border-amber-400/60
+          className="w-16 h-24 rounded-lg border-2 border-amber-400/60
                      bg-gradient-to-b from-indigo-900/80 to-purple-900/80
                      flex items-center justify-center text-3xl shadow-2xl"
           animate={{ rotateY: [0, 360] }}

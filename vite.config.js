@@ -26,7 +26,7 @@ function devApiPlugin() {
         }
 
         const apiKey = process.env.OPENROUTER_API_KEY;
-        const model = process.env.OPENROUTER_MODEL || 'deepseek/deepseek-r1';
+        const model = process.env.OPENROUTER_MODEL || 'deepseek/deepseek-chat';
 
         if (!apiKey) {
           res.statusCode = 500;
@@ -35,38 +35,62 @@ function devApiPlugin() {
         }
 
         const isKo = lang === 'ko';
+        const outputLang = isKo ? 'Korean' : 'English';
 
         const cardList = cards
           .map((c, i) => {
-            const name = isKo ? c.nameKo : c.nameEn;
-            const pos = c.position || `${i + 1}`;
-            return `- ${pos}: ${name}`;
+            const name = `${c.nameEn} (${c.nameKo})`;
+            const pos = c.position || `Card ${i + 1}`;
+            return `- Position [${pos}]: ${name}`;
           })
           .join('\n');
 
-        const systemPrompt = isKo
-          ? `당신은 전문 타로 리더입니다. 깊은 통찰력과 따뜻한 공감 능력으로 카드를 해석합니다.
-마크다운 형식으로 답변하세요. 각 카드를 개별적으로 해석한 후, 전체 흐름을 종합하고, 실질적인 조언을 제공하세요.
-카드 이름에는 **굵게** 표시하세요. 전체 해석은 자연스럽고 이해하기 쉬운 한국어로 작성하세요.`
-          : `You are an expert tarot reader with deep insight and warm empathy.
-Respond in markdown format. Interpret each card individually, then provide an overall flow synthesis and practical advice.
-Use **bold** for card names. Write in clear, natural English.`;
+        const systemPrompt = `You are a professional tarot master specialized in Rider-Waite tarot interpretation with deep intuitive insight and warm empathy.
 
-        const userMessage = isKo
-          ? `스프레드: ${spread || '자유 배치'}
-${question ? `질문: ${question}` : '질문 없음 (일반 리딩)'}
+INPUT FORMAT:
+- You will receive card names with their spread positions as text.
+- Each card includes its English and Korean name, and its position in the spread.
 
-뽑은 카드:
+INTERPRETATION STRUCTURE — follow these steps in order:
+
+STEP 1: Individual Card Meaning
+For each card:
+- Traditional Rider-Waite meaning based on classical symbolism
+- Key symbolic elements (imagery, colors, numerology, astrological associations)
+- Emotional and psychological meaning
+- Practical real-world implication in the querent's life
+
+STEP 2: Spread Context & Card Interactions
+- How each card influences the others based on their positions
+- Energy flow and narrative arc across the spread
+- Dominant patterns: recurring suits, elements, numbers, or archetypes
+
+STEP 3: Situation Analysis
+- Current situation as revealed by the cards
+- Hidden factors or subconscious influences
+- Likely outcome trajectory if the current path continues
+
+STEP 4: Practical Advice
+- Actionable, concrete guidance the querent can apply immediately
+- Specific steps or mindset shifts to consider
+- Avoid vague spiritual platitudes — be direct and helpful
+
+FORMATTING RULES:
+- Use **bold** for all card names.
+- Use markdown headers (##) for each section.
+- Keep paragraphs concise but insightful.
+- Be specific and concrete — avoid generic horoscope-style interpretation.
+- Base all interpretations strictly on classical Rider-Waite symbolism.
+
+CRITICAL: Respond entirely in ${outputLang}.`;
+
+        const userMessage = `Spread type: ${spread || 'Free Layout'}
+${question ? `Querent's question: "${question}"` : 'No specific question — provide a general life reading.'}
+
+Cards drawn (in spread order):
 ${cardList}
 
-각 카드의 의미를 포지션에 맞게 해석하고, 카드들의 전체적인 흐름과 메시지를 종합해 주세요. 마지막에 실질적인 조언을 해 주세요.`
-          : `Spread: ${spread || 'Free Layout'}
-${question ? `Question: ${question}` : 'No question (general reading)'}
-
-Drawn cards:
-${cardList}
-
-Interpret each card according to its position, synthesize the overall flow and message, and provide practical advice at the end.`;
+Please provide a complete, structured tarot reading.`;
 
         try {
           const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -81,8 +105,8 @@ Interpret each card according to its position, synthesize the overall flow and m
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: userMessage },
               ],
-              max_tokens: 2000,
-              temperature: 0.8,
+              max_tokens: 2500,
+              temperature: 0.7,
             }),
           });
 

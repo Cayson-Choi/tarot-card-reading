@@ -55,26 +55,33 @@ export default function QuestionInput({ onSubmit, onSkip, onBack }) {
             />
           </div>
 
-          {/* Continue button */}
-          <motion.button
-            onClick={() => onSubmit(question)}
-            className="w-full py-3 rounded-xl font-medium text-sm
-                       bg-gradient-to-r from-amber-500 to-yellow-500
-                       text-gray-900 active:scale-95 transition-transform"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            {t.continue}
-          </motion.button>
-
-          {/* Skip link */}
-          <button
-            onClick={onSkip}
-            className="w-full mt-3 py-2 text-white/40 text-xs hover:text-white/60
-                       transition-colors text-center"
-          >
-            {t.skip}
-          </button>
+          {/* Action buttons */}
+          <div className="flex gap-3">
+            <motion.button
+              onClick={onSkip}
+              className="flex-1 py-3 rounded-xl text-sm font-medium
+                         bg-white/[0.06] backdrop-blur-md border border-white/[0.12]
+                         text-white/70 transition-all duration-300
+                         hover:bg-white/[0.1] hover:border-white/20 hover:text-white/90
+                         active:scale-95"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.96 }}
+            >
+              {t.skip}
+            </motion.button>
+            <motion.button
+              onClick={() => onSubmit(question)}
+              className="flex-1 py-3 rounded-xl text-sm font-medium
+                         bg-white/[0.06] backdrop-blur-md border border-amber-400/25
+                         text-amber-300/90 transition-all duration-300
+                         hover:bg-amber-400/[0.08] hover:border-amber-400/40 hover:text-amber-200
+                         active:scale-95"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.96 }}
+            >
+              {t.continue}
+            </motion.button>
+          </div>
         </div>
       </div>
     </motion.div>

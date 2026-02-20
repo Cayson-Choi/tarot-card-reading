@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { HiOutlineCamera, HiOutlineMail } from 'react-icons/hi';
+import { HiOutlineMail } from 'react-icons/hi';
 import { useLanguage } from '../i18n/LanguageContext';
 import LoadingSpinner from './LoadingSpinner';
 import BackButton from './BackButton';
@@ -256,47 +256,41 @@ export default function AIReadingPanel({
 
             {/* Action buttons (outside capture area) */}
             <motion.div
-              className="flex flex-col gap-3 items-center mt-6"
+              className="flex gap-3 items-center justify-center mt-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.5 }}
             >
-              {/* Primary row */}
-              <div className="flex flex-wrap gap-3 items-center justify-center">
-                {/* Save image */}
-                <button
-                  onClick={handleSaveImage}
-                  disabled={saving}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl
-                             bg-gradient-to-r from-purple-600 to-indigo-600
-                             text-white text-sm font-medium
-                             hover:from-purple-500 hover:to-indigo-500
-                             active:scale-95 transition-all disabled:opacity-50"
-                >
-                  <HiOutlineCamera className="text-base" />
-                  {t.saveImage}
-                </button>
+              <button
+                onClick={handleSaveImage}
+                disabled={saving}
+                className="flex-1 max-w-[140px] py-3 rounded-xl text-sm font-medium
+                           bg-white/[0.06] backdrop-blur-md border border-white/[0.12]
+                           text-white/70 transition-all duration-300
+                           hover:bg-white/[0.1] hover:border-white/20 hover:text-white/90
+                           active:scale-95 disabled:opacity-40"
+              >
+                {t.saveImage}
+              </button>
 
-                {/* Send email */}
-                <button
-                  onClick={handleSendEmail}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl
-                             bg-gradient-to-r from-emerald-600 to-teal-600
-                             text-white text-sm font-medium
-                             hover:from-emerald-500 hover:to-teal-500
-                             active:scale-95 transition-all"
-                >
-                  <HiOutlineMail className="text-base" />
-                  {t.sendEmail}
-                </button>
-              </div>
+              <button
+                onClick={handleSendEmail}
+                className="flex-1 max-w-[140px] py-3 rounded-xl text-sm font-medium
+                           bg-white/[0.06] backdrop-blur-md border border-white/[0.12]
+                           text-white/70 transition-all duration-300
+                           hover:bg-white/[0.1] hover:border-white/20 hover:text-white/90
+                           active:scale-95"
+              >
+                {t.sendEmail}
+              </button>
 
-              {/* New reading */}
               <button
                 onClick={onNewReading}
-                className="px-6 py-2.5 rounded-xl bg-white/10 text-white/70 text-sm
-                           font-medium hover:bg-white/15 transition-colors
-                           active:scale-95 border border-white/10"
+                className="flex-1 max-w-[140px] py-3 rounded-xl text-sm font-medium
+                           bg-white/[0.06] backdrop-blur-md border border-amber-400/25
+                           text-amber-300/90 transition-all duration-300
+                           hover:bg-amber-400/[0.08] hover:border-amber-400/40 hover:text-amber-200
+                           active:scale-95"
               >
                 {t.newReading}
               </button>

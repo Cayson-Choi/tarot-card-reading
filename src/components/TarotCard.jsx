@@ -42,7 +42,7 @@ export default function TarotCard({ card, isFlipped, onFlip, positionLabel, inde
           >
             <motion.div
               className="w-full h-full"
-              animate={!isFlipped ? { y: [0, -3, 0] } : {}}
+              animate={!isFlipped ? { y: [0, 3, 0] } : {}}
               transition={!isFlipped ? { duration: 3, repeat: Infinity, ease: 'easeInOut' } : {}}
             >
               <img
